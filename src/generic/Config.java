@@ -1,7 +1,7 @@
 package generic;
 
 /**
- * Application config
+ * Application config variables
  *
  * @author Piotr Polak
  *
