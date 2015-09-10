@@ -12,9 +12,10 @@ import java.net.Socket;
 public interface ControllerInterface {
 
     /**
-     * Method for handeling incoming messages
-     *
-     * @param mx
+     * Handles incoming messages
+     * 
+     * @param m
+     * @param socket 
      */
     public void handleIncomingMessage(Object m, Socket socket);
 
@@ -27,8 +28,8 @@ public interface ControllerInterface {
 
     /**
      * Notifies about socket error etc
-     *
-     * @param line
+     * 
+     * @param e 
      */
     public void notify(Exception e);
 }
