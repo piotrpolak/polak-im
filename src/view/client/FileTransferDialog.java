@@ -3,9 +3,10 @@ package view.client;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import java.util.Date;
+import javax.swing.JFileChooser;
 import model.Utilities;
 
-public class FileTransferDialog extends JFrame {
+public class FileTransferDialog extends JFrame implements TransferNotifierInterface {
 
     private long filesize;
     private long transfered = 0;
@@ -41,10 +42,38 @@ public class FileTransferDialog extends JFrame {
         this.setVisible(true);
         this.setResizable(false);
     }
+    
+    /**
+     * Returns the save path
+     * 
+     * @return directory path or null upon abort
+     */
+    public String getTransferPath()
+    {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setCurrentDirectory(new java.io.File("."));
+        chooser.setDialogTitle("Select destination directory");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setAcceptAllFileFilterUsed(false);
+        if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            return chooser.getSelectedFile().getAbsolutePath() + java.io.File.pathSeparator;
+        } else {
+            this.setVisible(false);
+            this.dispose();
+            return null;
+        }
+    }
 
-    public void setTransfered(long transfered) {
+    /**
+     * Receives notification about the number of bytes received
+     *
+     * @param transfered
+     * @return success
+     */
+    public boolean setTransfered(long transfered) {
         this.transfered = transfered;
         this.redraw();
+        return true;
     }
 
     private void redraw() {

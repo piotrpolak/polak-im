@@ -6,18 +6,33 @@ import java.net.Socket;
 import java.io.IOException;
 import java.io.File;
 import java.io.FileNotFoundException;
-import javax.swing.JFileChooser;
 
-import view.client.FileTransferDialog;
+import view.client.TransferNotifierInterface;
 
+/**
+ * Asynchronous file reader
+ *
+ * Enables reading incoming file transfers in a separate nonblocking thread
+ *
+ * @author Piotr Polak
+ *
+ */
 public class AsyncFileReader extends Thread {
 
-    private Socket socket;
-    private String filename;
-    private long filesize;
-    private FileTransferDialog notifier = null;
+    private final Socket socket;
+    private final String filename;
+    private final long filesize;
+    private TransferNotifierInterface notifier = null;
 
-    public AsyncFileReader(Socket socket, String filename, long filesize, FileTransferDialog notifier) {
+    /**
+     * Default constructor
+     * 
+     * @param socket
+     * @param filename
+     * @param filesize
+     * @param notifier
+     */
+    public AsyncFileReader(Socket socket, String filename, long filesize, TransferNotifierInterface notifier) {
         this.socket = socket;
         this.filename = filename;
         this.filesize = filesize;
@@ -28,77 +43,93 @@ public class AsyncFileReader extends Thread {
 
     /**
      * Thread main method
+     * 
+     *
      */
+    @Override
     public void run() {
-        String fileSavePath = "";
-        JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new java.io.File("."));
-        chooser.setDialogTitle("Select destination directory");
-        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setAcceptAllFileFilterUsed(false);
-        if (chooser.showOpenDialog(notifier) == JFileChooser.APPROVE_OPTION) {
-            fileSavePath = chooser.getSelectedFile().getAbsolutePath() + java.io.File.pathSeparator + this.filename;
-
-        } else {
-            notifier.setVisible(false);
+        
+        // Get file save path
+        String fileSavePath = notifier.getTransferPath();
+        
+        // Abort file transfer
+        if( fileSavePath == null )
+        {
             notifier = null;
             return;
         }
+        
+        // Append filename previously received in the envelope
+        fileSavePath += this.filename;
 
+        // TODO prevent file overwrite, display confirmation popup
+        
+        // Attempt to create a new file
         File file = new File(fileSavePath);
         try {
             file.createNewFile();
         } catch (IOException e) {
+            // TODO set notification message
+            return;
         }
 
+        // Attempt to create a file output stream
         FileOutputStream fos;
         try {
             fos = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            // TODO set notification message
             return;
         }
+        
+        // Attempt to create a socket input stream
         InputStream in;
         try {
             in = socket.getInputStream();
         } catch (IOException e) {
-            e.printStackTrace();
+            // TODO set notification message
             return;
         }
 
         int bytesRead = 0;
         int allBytesRead = 0;
+        
+        // Creating the buffer with the length specified in the config
         byte[] buffer = new byte[generic.Config.FILE_TRANSFER_BUFFER_SIZE];
 
         try {
             while (allBytesRead < this.filesize) {
                 bytesRead = in.read(buffer, 0, buffer.length);
                 allBytesRead += bytesRead;
+                
+                // Set notification
                 this.notifyNotifier(allBytesRead);
 
+                // Redirecting socket stream to the file
                 try {
                     fos.write(buffer, 0, bytesRead);
                     fos.flush();
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    // TODO set notification message
                 }
             }
         } catch (IOException e) {
-            //e.printStackTrace();
+            // TODO set notification message
         }
 
+        // Closing the file output stream
         try {
             fos.close();
         } catch (IOException e) {
-            //e.printStackTrace();
+            // Do nothing            
         }
 
     }
 
     /**
-     * Notifies notifier, if specified
-     *
-     * @param e
+     * Notifies the notifier object about the number of bytes transfered
+     * 
+     * @param transfered 
      */
     private void notifyNotifier(long transfered) {
         if (this.notifier != null) {

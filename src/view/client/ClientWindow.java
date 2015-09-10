@@ -3,8 +3,6 @@ package view.client;
 import generic.*;
 import javax.swing.JFrame;
 import javax.swing.UIManager;
-import message.ServerSignInSuccessMessage;
-import model.AsyncObjectSender;
 import java.util.HashMap;
 import controller.IMClientController;
 
@@ -21,7 +19,6 @@ public class ClientWindow extends JFrame {
     protected UserListPanel userListPanel;
     protected HashMap<String, ConversationWindow> conversationWindows;
 
-	// ------------------------------------------------------------
     /**
      * Default controller
      *
