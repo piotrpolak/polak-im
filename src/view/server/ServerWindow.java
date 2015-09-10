@@ -54,8 +54,7 @@ public class ServerWindow extends JFrame {
         output = new JTextPane();
         output.setEditable(false);
         scrollPane = new JScrollPane(output);
-        scrollPane.setVerticalScrollBarPolicy(
-                JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         scrollPane.setAutoscrolls(true);
         scrollPane.setBounds(10, 10, 350, 240);
 
