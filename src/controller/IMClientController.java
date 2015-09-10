@@ -178,14 +178,21 @@ public class IMClientController extends AbstractController {
 
     public void signout() {
         this.applicationStage = ApplicationStages.SIGNIN;
-        this.messageListener.stopListener();
+        
+        if( this.messageListener != null )
+        {
+            this.messageListener.stopListener();
+        }
+        
         try {
             (new SyncObjectSender(this.serverIp, Config.SERVER_LISTEN)).send(new SignoutRequestMessage(user.getUsername()));
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
         } finally {
             System.exit(0);
         }
+        
+        
     }
 
     /**
