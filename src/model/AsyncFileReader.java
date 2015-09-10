@@ -98,8 +98,11 @@ public class AsyncFileReader extends Thread {
         byte[] buffer = new byte[generic.Config.FILE_TRANSFER_BUFFER_SIZE];
 
         try {
+             // Reading from socket in a loop
             while (allBytesRead < this.filesize) {
+                // Reading data from the stream
                 bytesRead = in.read(buffer, 0, buffer.length);
+                // Some statistics
                 allBytesRead += bytesRead;
                 
                 // Set notification
