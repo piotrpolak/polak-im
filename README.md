@@ -8,12 +8,12 @@ Any client can communicate between the server and the other clients. Each client
 
 File transfer between two clients is implemented in the following way: 1 sending file transfer header (serialized object), 2 waiting for the acceptance, 3 sending the file as raw binary stream.
 
-The GUI of the client is implemented on thread independent on the communication threads. Most of the communication is asyncronous.
+The GUI of the client is implemented on thread independent on the communication threads. Most of the communication is asynchronous.
 
 ## Features
 
 * Messages send as serialized objects
-* Server used only for registering/updating userlist
+* Server used only for registering/updating user list
 * Clients communication is P2P
 * Implemented Server, Client, GUI (Swing), File transfer, SSL
 
@@ -27,14 +27,32 @@ The content of this section is outdated.
 
 *IMServer* - the base class containing the main method. The main method contains the listening loop (using Java ServerSocket).
 
-For each incomming connection there is an IMServerThread instance created. IMServerThread exstends the Thread class and takes the incomming socket connection as the parameter. The reason for this is that having many threads we can threat many incomming connections in parallel. IMServerThread acts as an action handeler.
+For each incoming connection there is an IMServerThread instance created. IMServerThread extends the Thread class and takes the incoming socket connection as the parameter. The reason for this is that having many threads we can threat many incomming connections in parallel. IMServerThread acts as an action handeler.
 
-The IMServerThread reads a serialized object and takes an action based on the object type. Basically there are 3 types of the incomming objects:
+The IMServerThread reads a serialized object and takes an action based on the object type. Basically there are 3 types of the incoming objects:
 
 * IMMessage - a common text message
 * UserListMessage - user list sent by the server
 * FileTransferHeader - a header for the following file transfer
-* CustomServerMessage - server messager, errors etc
+* CustomServerMessage - server message, errors etc
+
+## Building application
+
+```bash
+mvn package
+```
+
+## Running application
+
+### Running server application
+```
+java -cp ./target/polak-im-1.0.0-SNAPSHOT.jar controller.IMClientController
+```
+
+### Running client application
+```
+java -cp ./target/polak-im-1.0.0-SNAPSHOT.jar controller.IMServerController
+```
 
 ## GUI
 
@@ -48,7 +66,7 @@ The IMServerThread reads a serialized object and takes an action based on the ob
 
 ## Known Issues
 
-* SSL without authentification (no certificates)
+* SSL without authentication (no certificates)
 * Issues with message exchange protocol (sources of messages are not verified thus message sender can be spoofed)
 * Swing KeyListeners are not implemented
 
